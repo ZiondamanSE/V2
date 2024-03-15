@@ -11,6 +11,7 @@ public class PHelth : MonoBehaviour
     private float Health;
     private float lerpTimer;
 
+    [Header("Helth Bar")]
     public float maxHealth = 100f;
     public float chipSpeed = 2f;
 
@@ -19,17 +20,42 @@ public class PHelth : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI helthText;
 
-    // Start is called before the first frame update
+    [Header("Damage Overlay")]
+    public Image overlay;
+    public float duration;
+    public float fadeSpeed;
+
+    private float durationTimer;
+
+
     void Start()
     {
         Health = maxHealth;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         Health = Mathf.Clamp(Health, 0, maxHealth);
         UpdateHealthUI();
+
+
+        // overlay fade
+        if(overlay.color.a > 0 )
+        {
+            if (Health < 30)
+            {
+                return;
+            }
+            durationTimer += Time.deltaTime;
+            if (durationTimer > duration)
+            {
+                float tempAlpha = overlay.color.a;
+                tempAlpha -= Time.deltaTime * fadeSpeed;
+                overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, tempAlpha);
+            }
+        }
     }
 
     public void UpdateHealthUI()
@@ -62,6 +88,8 @@ public class PHelth : MonoBehaviour
     {
         Health -= damage;
         lerpTimer = 0f;
+        durationTimer = 0;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1);
     }
 
     public void RestoreHealth(float healAmout)
